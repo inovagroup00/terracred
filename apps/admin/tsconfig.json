@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "types": ["vite/client"],
+    "paths": {
+      "@credshow/types": ["../../packages/types/index.ts"],
+      "@credshow/types/database": ["../../packages/types/database.ts"],
+      "@credshow/lib": ["../../packages/lib/src/index.ts"],
+      "@credshow/lib/*": ["../../packages/lib/src/*"],
+      "@credshow/ui": ["../../packages/ui/src/index.ts"]
+    },
+    "noEmit": true
+  },
+  "include": ["src", "vite.config.ts"]
+}

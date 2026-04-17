@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.turbo/
+.next/
+.env
+.env.local
+.env.*.local
+.vercel/
+*.log
+.DS_Store
+.supabase/
+playwright-report/
+test-results/
+.idea/
+.vscode/
