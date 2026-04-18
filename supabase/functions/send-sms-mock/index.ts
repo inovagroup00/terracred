@@ -59,7 +59,7 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: "db_error", message: updateErr.message }, 500);
     }
 
-    const baseUrl = client_base_url ?? "https://TerraCred-cliente.vercel.app";
+    const baseUrl = client_base_url ?? "https://inovagroup00.github.io/terracred/cliente";
     const link = `${baseUrl}/?t=${smsLinkToken}`;
 
     console.log(`[SMS MOCK] to=${phone} link=${link}`);

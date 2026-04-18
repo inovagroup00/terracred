@@ -1,0 +1,69 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAGES: "1"
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --no-frozen-lockfile
+
+      - name: Build all apps
+        run: pnpm turbo run build
+
+      - name: Compose deployment site
+        run: |
+          mkdir -p public/promotor public/cliente public/admin
+          cp -r apps/promotor/dist/* public/promotor/
+          cp -r apps/cliente/dist/*  public/cliente/
+          cp -r apps/admin/dist/*    public/admin/
+          # SPA fallback: GitHub Pages serve 404.html quando rota nao existe.
+          # Copiamos index.html para 404.html em cada app.
+          cp public/promotor/index.html public/promotor/404.html
+          cp public/cliente/index.html  public/cliente/404.html
+          cp public/admin/index.html    public/admin/404.html
+          # Landing page
+          cp .github/landing.html public/index.html
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

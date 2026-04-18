@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
+  base: process.env.GITHUB_PAGES === "1" ? "/terracred/promotor/" : "/",
   server: { port: 5173, host: true },
   preview: { port: 4173, host: true },
 });

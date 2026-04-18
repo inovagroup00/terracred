@@ -17,4 +17,4 @@ export const SUPABASE_ANON_KEY = assertEnv(
 
 export const PROMOTOR_BASE_URL =
   (import.meta.env.VITE_PROMOTOR_BASE_URL as string | undefined)?.trim() ||
-  "https://TerraCred-promotor.vercel.app";
+  "https://inovagroup00.github.io/terracred/promotor";
