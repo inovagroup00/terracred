@@ -1,10 +1,18 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button, Card, Input } from "@credshow/ui";
-import { getSupabase, isValidEmail } from "@credshow/lib";
+import { getSupabase } from "@credshow/lib";
 
 interface LocationState {
   from?: { pathname: string };
+}
+
+// Converte usuario tipo "terra" em "terra@terra.com" pra autenticar no Supabase.
+// Mantem retrocompatibilidade caso digite o email completo.
+function toLoginEmail(input: string): string {
+  const v = input.trim();
+  if (v.includes("@")) return v.toLowerCase();
+  return `${v.toLowerCase()}@terra.com`;
 }
 
 export function Login() {
@@ -12,12 +20,11 @@ export function Login() {
   const loc = useLocation();
   const from = (loc.state as LocationState | null)?.from?.pathname ?? "/";
 
-  const [email, setEmail] = useState("");
+  const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // If already authenticated as admin, skip login
   useEffect(() => {
     let cancelled = false;
     void (async () => {
@@ -42,17 +49,18 @@ export function Login() {
     e.preventDefault();
     setError(null);
 
-    if (!isValidEmail(email)) {
-      setError("Informe um email valido.");
+    if (!user.trim()) {
+      setError("Informe o usuario.");
       return;
     }
-    if (password.length < 6) {
-      setError("Senha deve ter ao menos 6 caracteres.");
+    if (!password) {
+      setError("Informe a senha.");
       return;
     }
 
     setLoading(true);
     try {
+      const email = toLoginEmail(user);
       const sb = getSupabase();
       const { data, error: authErr } = await sb.auth.signInWithPassword({
         email,
@@ -93,7 +101,7 @@ export function Login() {
       <Card className="w-full max-w-md p-8">
         <div className="mb-6 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-600 text-lg font-bold text-white">
-            C
+            T
           </div>
           <div>
             <h1 className="text-lg font-semibold text-slate-900">TerraCred Admin</h1>
@@ -103,12 +111,12 @@ export function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            label="Email"
-            type="email"
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="adminTerraCred.test"
+            label="Usuario"
+            type="text"
+            autoComplete="username"
+            value={user}
+            onChange={(e) => setUser(e.target.value)}
+            placeholder="terra"
             required
           />
           <Input
